@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Your results | MediCare Assistant{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm mb-3">
+  <i class="bi bi-arrow-left me-1"></i>New check
+</a>
+
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-body p-4">
+    <div class="small text-muted mb-1">Symptoms you entered</div>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      {% for s in r.symptoms_used %}<span class="badge rounded-pill chip">{{ s }}</span>{% endfor %}
+    </div>
+
+    <h2 class="h4 fw-bold mb-3">Most likely matches</h2>
+    {% for p in r.top_predictions %}
+    <div class="mb-3">
+      <div class="d-flex justify-content-between">
+        <span class="{{ 'fw-bold' if loop.first else '' }}">{{ p.disease }}</span>
+        <span class="text-muted">{{ p.score }}% match score</span>
+      </div>
+      <div class="progress" style="height: 10px;">
+        <div class="progress-bar {{ '' if loop.first else 'bg-secondary' }}" style="width: {{ p.score }}%"></div>
+      </div>
+    </div>
+    {% endfor %}
+    <div class="small text-muted">Match score ranks how well your symptoms fit each condition. It is not a probability or a diagnosis.</div>
+  </div>
+</div>
+
+<h2 class="h4 fw-bold mb-3">Guidance for: {{ r.best }}</h2>
+<p class="text-muted">{{ r.description }}</p>
+
+<div class="row g-3">
+  {% set sections = [
+    ('Precautions', 'bi-shield-check', r.precautions),
+    ('Common medications', 'bi-capsule', r.medications),
+    ('Diet suggestions', 'bi-egg-fried', r.diet),
+    ('Lifestyle and workout', 'bi-activity', r.workout)
+  ] %}
+  {% for title, icon, items in sections %}
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-body">
+        <h3 class="h6 fw-bold mb-3"><i class="bi {{ icon }} me-2 text-primary"></i>{{ title }}</h3>
+        <ul class="mb-0 ps-3">
+          {% for i in items %}<li>{{ i }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
